@@ -67,6 +67,38 @@ class Amazon extends AbstractProvider
         return ' ';
     }
 
+	/**
+	 * Returns authorization parameters based on provided options.
+	 *
+	 * @param  array $options
+	 * @return array Authorization parameters
+	 */
+	protected function getAuthorizationParameters(array $options)
+	{
+		if (empty($options['scope'])) {
+			$options['scope'] = $this->getDefaultScopes();
+		}
+
+		$options += [
+			'response_type' => 'code',
+		];
+
+		if (is_array($options['scope'])) {
+			$separator = $this->getScopeSeparator();
+			$options['scope'] = implode($separator, $options['scope']);
+		}
+
+		// Business code layer might set a different redirect_uri parameter
+		// depending on the context, leave it as-is
+		if (!isset($options['redirect_uri'])) {
+			$options['redirect_uri'] = $this->redirectUri;
+		}
+
+		$options['client_id'] = $this->clientId;
+
+		return $options;
+	}
+
     /**
      * Check a provider response for errors.
      *
