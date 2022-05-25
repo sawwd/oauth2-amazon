@@ -75,6 +75,10 @@ class Amazon extends AbstractProvider
 	 */
 	protected function getAuthorizationParameters(array $options)
 	{
+		if (empty($options['state'])) {
+			$options['state'] = $this->getRandomState();
+		}
+
 		if (empty($options['scope'])) {
 			$options['scope'] = $this->getDefaultScopes();
 		}
@@ -87,6 +91,9 @@ class Amazon extends AbstractProvider
 			$separator = $this->getScopeSeparator();
 			$options['scope'] = implode($separator, $options['scope']);
 		}
+
+		// Store the state as it may need to be accessed later on.
+		$this->state = $options['state'];
 
 		// Business code layer might set a different redirect_uri parameter
 		// depending on the context, leave it as-is
